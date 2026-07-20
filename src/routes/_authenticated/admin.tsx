@@ -39,7 +39,7 @@ function AdminPage() {
     queryFn: async () => (await supabase.from("career_applications").select("*").order("created_at", { ascending: false })).data ?? [],
   });
 
-  async function updateBookingStatus(id: string, status: string) {
+  async function updateBookingStatus(id: string, status: "confirmed" | "cancelled" | "pending" | "active" | "completed") {
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Updated");
