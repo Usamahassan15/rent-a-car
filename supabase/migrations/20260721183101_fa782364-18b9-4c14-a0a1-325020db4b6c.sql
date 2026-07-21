@@ -1,0 +1,1 @@
+GRANT INSERT ON public.bookings TO anon; CREATE POLICY "Anyone can submit a booking enquiry" ON public.bookings FOR INSERT TO anon, authenticated WITH CHECK (true);
