@@ -42,29 +42,38 @@ export function BookingDialog({
   });
 
   async function onSubmit(values: FormData) {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from("bookings").insert({
-      user_id: user?.id ?? null,
-      vehicle_id: vehicleId ?? null,
-      full_name: values.full_name,
-      phone: values.phone,
-      whatsapp: values.whatsapp || null,
-      email: values.email || null,
-      pickup_city: values.pickup_city || null,
-      drop_city: values.drop_city || null,
-      pickup_date: values.pickup_date,
-      return_date: values.return_date,
-      pickup_time: values.pickup_time || null,
-      message: values.message || null,
-      promo_code: values.promo_code || null,
-    });
-    if (error) {
-      toast.error("Could not save booking: " + error.message);
-      return;
-    }
-    toast.success("Booking submitted! Opening WhatsApp…");
+    // Open WhatsApp immediately while we still have the user gesture (avoids popup blockers)
     const msg = bookingMessage({ ...values, vehicle: vehicleName });
-    window.open(whatsappLink(msg), "_blank");
+    const waWin = window.open(whatsappLink(msg), "_blank");
+
+    // Persist booking in background — never block the WhatsApp handoff
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase.from("bookings").insert({
+        user_id: user?.id ?? null,
+        vehicle_id: vehicleId ?? null,
+        full_name: values.full_name,
+        phone: values.phone,
+        whatsapp: values.whatsapp || null,
+        email: values.email || null,
+        pickup_city: values.pickup_city || null,
+        drop_city: values.drop_city || null,
+        pickup_date: values.pickup_date,
+        return_date: values.return_date,
+        pickup_time: values.pickup_time || null,
+        message: values.message || null,
+        promo_code: values.promo_code || null,
+      });
+      if (error) console.warn("Booking save failed:", error.message);
+    } catch (e) {
+      console.warn("Booking save error:", e);
+    }
+
+    toast.success("Booking sent! Continue on WhatsApp.");
+    if (!waWin) {
+      // Fallback if popup was blocked
+      window.location.href = whatsappLink(msg);
+    }
     setOpen(false);
     form.reset();
   }
