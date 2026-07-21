@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookingDialog } from "@/components/site/booking-dialog";
 import { VehicleCard } from "@/components/site/vehicle-card";
+import { Car3DCarousel } from "@/components/site/car-3d-carousel";
 import { whatsappLink } from "@/lib/whatsapp";
 import { CATEGORIES, CITIES, PACKAGES } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
