@@ -38,6 +38,10 @@ function AdminPage() {
     queryKey: ["admin-careers"],
     queryFn: async () => (await supabase.from("career_applications").select("*").order("created_at", { ascending: false })).data ?? [],
   });
+  const { data: reviews } = useQuery({
+    queryKey: ["admin-reviews"],
+    queryFn: async () => (await supabase.from("reviews").select("*").order("created_at", { ascending: false })).data ?? [],
+  });
 
   async function updateBookingStatus(id: string, status: "confirmed" | "cancelled" | "pending" | "active" | "completed") {
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
@@ -45,6 +49,29 @@ function AdminPage() {
     toast.success("Updated");
     qc.invalidateQueries({ queryKey: ["admin-bookings"] });
   }
+
+  async function updateVehicle(id: string, patch: { published?: boolean; is_featured?: boolean; is_available?: boolean }) {
+    const { error } = await supabase.from("vehicles").update(patch).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Vehicle updated");
+    qc.invalidateQueries({ queryKey: ["admin-vehicles"] });
+    qc.invalidateQueries({ queryKey: ["all-vehicles"] });
+    qc.invalidateQueries({ queryKey: ["featured-vehicles"] });
+  }
+
+  async function setReviewApproved(id: string, approved: boolean) {
+    const { error } = await supabase.from("reviews").update({ approved }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(approved ? "Review approved" : "Review hidden");
+    qc.invalidateQueries({ queryKey: ["admin-reviews"] });
+  }
+
+  async function setContactHandled(id: string, handled: boolean) {
+    const { error } = await supabase.from("contact_messages").update({ handled }).eq("id", id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["admin-contacts"] });
+  }
+
 
   return (
     <div className="pt-24 pb-16 min-h-screen bg-secondary">
@@ -66,7 +93,9 @@ function AdminPage() {
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
             <TabsTrigger value="contacts">Messages</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews</TabsTrigger>
             <TabsTrigger value="careers">Applications</TabsTrigger>
+
           </TabsList>
 
           <TabsContent value="bookings" className="mt-4">
@@ -114,6 +143,7 @@ function AdminPage() {
                     <TableHead>Price/day</TableHead>
                     <TableHead>Featured</TableHead>
                     <TableHead>Published</TableHead>
+                    <TableHead>Available</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -122,12 +152,46 @@ function AdminPage() {
                       <TableCell className="font-medium">{v.name}</TableCell>
                       <TableCell>{v.brand}</TableCell>
                       <TableCell>PKR {Number(v.price_per_day).toLocaleString()}</TableCell>
-                      <TableCell>{v.is_featured ? "★" : "—"}</TableCell>
-                      <TableCell>{v.published ? "Yes" : "No"}</TableCell>
+                      <TableCell>
+                        <Button size="sm" variant={v.is_featured ? "default" : "outline"} onClick={() => updateVehicle(v.id, { is_featured: !v.is_featured })}>
+                          {v.is_featured ? "★ Featured" : "Feature"}
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button size="sm" variant={v.published ? "default" : "outline"} onClick={() => updateVehicle(v.id, { published: !v.published })}>
+                          {v.published ? "Live" : "Draft"}
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button size="sm" variant={v.is_available ? "default" : "outline"} onClick={() => updateVehicle(v.id, { is_available: !v.is_available })}>
+                          {v.is_available ? "Available" : "Booked"}
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reviews" className="mt-4">
+            <div className="rounded-xl border bg-card divide-y">
+              {reviews?.map((r: any) => (
+                <div key={r.id} className="p-4 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <strong>{r.author_name}</strong>
+                      <Badge variant="outline">{r.rating}★</Badge>
+                      {!r.approved && <Badge variant="outline">Pending</Badge>}
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground max-w-2xl">{r.comment}</p>
+                  </div>
+                  <Button size="sm" variant={r.approved ? "outline" : "default"} onClick={() => setReviewApproved(r.id, !r.approved)}>
+                    {r.approved ? "Hide" : "Approve"}
+                  </Button>
+                </div>
+              ))}
+              {!reviews?.length && <p className="p-6 text-sm text-muted-foreground">No reviews yet.</p>}
             </div>
           </TabsContent>
 
@@ -138,8 +202,12 @@ function AdminPage() {
                   <div className="flex justify-between text-sm"><strong>{c.full_name}</strong><span className="text-muted-foreground">{new Date(c.created_at).toLocaleDateString()}</span></div>
                   <p className="text-xs text-muted-foreground">{c.email} · {c.phone}</p>
                   <p className="mt-2 text-sm">{c.message}</p>
+                  <Button size="sm" variant={c.handled ? "outline" : "default"} className="mt-3" onClick={() => setContactHandled(c.id, !c.handled)}>
+                    {c.handled ? "Handled" : "Mark handled"}
+                  </Button>
                 </div>
               ))}
+              {!contacts?.length && <p className="p-6 text-sm text-muted-foreground">No messages yet.</p>}
             </div>
           </TabsContent>
 
@@ -152,8 +220,10 @@ function AdminPage() {
                   <p className="mt-2 text-sm">{c.cover_letter}</p>
                 </div>
               ))}
+              {!careers?.length && <p className="p-6 text-sm text-muted-foreground">No applications yet.</p>}
             </div>
           </TabsContent>
+
         </Tabs>
       </div>
     </div>

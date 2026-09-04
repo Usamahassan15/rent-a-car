@@ -64,12 +64,21 @@ function ProfilePage() {
     qc.invalidateQueries({ queryKey: ["profile"] });
   }
 
+  async function claimAdmin() {
+    const { data, error } = await supabase.rpc("claim_admin");
+    if (error) return toast.error(error.message);
+    if (!data) return toast.error("Admin access is already assigned to another account.");
+    toast.success("Admin access granted");
+    qc.invalidateQueries({ queryKey: ["is-admin"] });
+  }
+
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
+
 
   return (
     <div className="pt-24 pb-16 bg-secondary min-h-screen">
@@ -89,12 +98,17 @@ function ProfilePage() {
           <Link to="/wishlist" className="group rounded-xl border bg-card p-4 shadow-card hover:border-primary hover:shadow-red transition">
             <Heart className="size-6 text-primary" /><p className="mt-2 font-medium">Wishlist</p>
           </Link>
-          {isAdmin && (
+          {isAdmin ? (
             <Link to="/admin" className="group rounded-xl border bg-card p-4 shadow-card hover:border-primary hover:shadow-red transition">
               <Shield className="size-6 text-primary" /><p className="mt-2 font-medium">Admin Panel</p>
             </Link>
+          ) : (
+            <button onClick={claimAdmin} className="text-left rounded-xl border bg-card p-4 shadow-card hover:border-primary hover:shadow-red transition">
+              <Shield className="size-6 text-primary" /><p className="mt-2 font-medium">Claim Admin</p>
+            </button>
           )}
         </div>
+
 
         <div className="rounded-2xl border bg-card p-6 shadow-card space-y-4">
           <div className="flex items-center gap-3">

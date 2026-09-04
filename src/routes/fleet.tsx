@@ -28,24 +28,31 @@ function FleetPage() {
   const { data } = useQuery({
     queryKey: ["all-vehicles"],
     queryFn: async () => {
-      const { data } = await supabase.from("vehicles").select("*").eq("published", true);
+      const { data } = await supabase
+        .from("vehicles")
+        .select("*, categories(slug,name), cities(slug,name)")
+        .eq("published", true);
       return data ?? [];
     },
   });
 
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("all");
+  const [city, setCity] = useState<string>("all");
   const [sort, setSort] = useState<string>("featured");
 
   const filtered = useMemo(() => {
-    let list = [...(data ?? [])];
+    let list = [...(data ?? [])] as any[];
     if (q) list = list.filter((v) => (v.name + " " + v.brand).toLowerCase().includes(q.toLowerCase()));
+    if (cat !== "all") list = list.filter((v) => v.categories?.slug === cat);
+    if (city !== "all") list = list.filter((v) => v.cities?.name === city);
     if (sort === "price-asc") list.sort((a, b) => Number(a.price_per_day) - Number(b.price_per_day));
     if (sort === "price-desc") list.sort((a, b) => Number(b.price_per_day) - Number(a.price_per_day));
     if (sort === "rating") list.sort((a, b) => Number(b.rating) - Number(a.rating));
     if (sort === "featured") list.sort((a, b) => Number(b.is_featured) - Number(a.is_featured));
     return list;
-  }, [data, q, sort, cat]);
+  }, [data, q, sort, cat, city]);
+
 
   return (
     <div>
@@ -58,7 +65,7 @@ function FleetPage() {
       </section>
 
       <section className="container-wide py-10">
-        <div className="glass rounded-2xl p-4 md:p-5 shadow-card grid gap-3 md:grid-cols-4">
+        <div className="glass rounded-2xl p-4 md:p-5 shadow-card grid gap-3 md:grid-cols-5">
           <div className="relative md:col-span-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search Prado, Mercedes, Audi…" className="pl-9 h-11" />
@@ -70,6 +77,14 @@ function FleetPage() {
               {CATEGORIES.map(c => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}
             </SelectContent>
           </Select>
+          <Select value={city} onValueChange={setCity}>
+            <SelectTrigger className="h-11"><SelectValue placeholder="City" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Cities</SelectItem>
+              {CITIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
           <Select value={sort} onValueChange={setSort}>
             <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
             <SelectContent>
