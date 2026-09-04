@@ -93,7 +93,9 @@ function AdminPage() {
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
             <TabsTrigger value="contacts">Messages</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews</TabsTrigger>
             <TabsTrigger value="careers">Applications</TabsTrigger>
+
           </TabsList>
 
           <TabsContent value="bookings" className="mt-4">
