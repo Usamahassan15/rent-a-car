@@ -38,6 +38,10 @@ function AdminPage() {
     queryKey: ["admin-careers"],
     queryFn: async () => (await supabase.from("career_applications").select("*").order("created_at", { ascending: false })).data ?? [],
   });
+  const { data: reviews } = useQuery({
+    queryKey: ["admin-reviews"],
+    queryFn: async () => (await supabase.from("reviews").select("*").order("created_at", { ascending: false })).data ?? [],
+  });
 
   async function updateBookingStatus(id: string, status: "confirmed" | "cancelled" | "pending" | "active" | "completed") {
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
@@ -45,6 +49,29 @@ function AdminPage() {
     toast.success("Updated");
     qc.invalidateQueries({ queryKey: ["admin-bookings"] });
   }
+
+  async function updateVehicle(id: string, patch: { published?: boolean; is_featured?: boolean; is_available?: boolean }) {
+    const { error } = await supabase.from("vehicles").update(patch).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Vehicle updated");
+    qc.invalidateQueries({ queryKey: ["admin-vehicles"] });
+    qc.invalidateQueries({ queryKey: ["all-vehicles"] });
+    qc.invalidateQueries({ queryKey: ["featured-vehicles"] });
+  }
+
+  async function setReviewApproved(id: string, approved: boolean) {
+    const { error } = await supabase.from("reviews").update({ approved }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(approved ? "Review approved" : "Review hidden");
+    qc.invalidateQueries({ queryKey: ["admin-reviews"] });
+  }
+
+  async function setContactHandled(id: string, handled: boolean) {
+    const { error } = await supabase.from("contact_messages").update({ handled }).eq("id", id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["admin-contacts"] });
+  }
+
 
   return (
     <div className="pt-24 pb-16 min-h-screen bg-secondary">
