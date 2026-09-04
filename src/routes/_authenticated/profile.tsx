@@ -64,12 +64,21 @@ function ProfilePage() {
     qc.invalidateQueries({ queryKey: ["profile"] });
   }
 
+  async function claimAdmin() {
+    const { data, error } = await supabase.rpc("claim_admin");
+    if (error) return toast.error(error.message);
+    if (!data) return toast.error("Admin access is already assigned to another account.");
+    toast.success("Admin access granted");
+    qc.invalidateQueries({ queryKey: ["is-admin"] });
+  }
+
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
+
 
   return (
     <div className="pt-24 pb-16 bg-secondary min-h-screen">
