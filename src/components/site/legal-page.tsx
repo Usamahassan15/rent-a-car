@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { CONTACT } from "@/lib/site";
+import { WHATSAPP_NUMBER_DISPLAY } from "@/lib/whatsapp";
 
 type Section = { h: string; p: string };
 
@@ -35,7 +35,7 @@ export function LegalPage({
           <div className="rounded-2xl border bg-card p-6 shadow-card">
             <h2 className="font-display text-xl font-semibold">Questions?</h2>
             <p className="mt-2 text-muted-foreground">
-              Contact our team on WhatsApp or call {CONTACT?.phoneDisplay ?? "0317 5817400"} — we respond 24/7.
+              Contact our team on WhatsApp or call {WHATSAPP_NUMBER_DISPLAY} — we respond 24/7.
             </p>
           </div>
         </div>
