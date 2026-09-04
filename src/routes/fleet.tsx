@@ -28,24 +28,31 @@ function FleetPage() {
   const { data } = useQuery({
     queryKey: ["all-vehicles"],
     queryFn: async () => {
-      const { data } = await supabase.from("vehicles").select("*").eq("published", true);
+      const { data } = await supabase
+        .from("vehicles")
+        .select("*, categories(slug,name), cities(slug,name)")
+        .eq("published", true);
       return data ?? [];
     },
   });
 
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("all");
+  const [city, setCity] = useState<string>("all");
   const [sort, setSort] = useState<string>("featured");
 
   const filtered = useMemo(() => {
-    let list = [...(data ?? [])];
+    let list = [...(data ?? [])] as any[];
     if (q) list = list.filter((v) => (v.name + " " + v.brand).toLowerCase().includes(q.toLowerCase()));
+    if (cat !== "all") list = list.filter((v) => v.categories?.slug === cat);
+    if (city !== "all") list = list.filter((v) => v.cities?.name === city);
     if (sort === "price-asc") list.sort((a, b) => Number(a.price_per_day) - Number(b.price_per_day));
     if (sort === "price-desc") list.sort((a, b) => Number(b.price_per_day) - Number(a.price_per_day));
     if (sort === "rating") list.sort((a, b) => Number(b.rating) - Number(a.rating));
     if (sort === "featured") list.sort((a, b) => Number(b.is_featured) - Number(a.is_featured));
     return list;
-  }, [data, q, sort, cat]);
+  }, [data, q, sort, cat, city]);
+
 
   return (
     <div>
