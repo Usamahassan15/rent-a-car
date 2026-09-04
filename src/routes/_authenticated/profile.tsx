@@ -89,12 +89,17 @@ function ProfilePage() {
           <Link to="/wishlist" className="group rounded-xl border bg-card p-4 shadow-card hover:border-primary hover:shadow-red transition">
             <Heart className="size-6 text-primary" /><p className="mt-2 font-medium">Wishlist</p>
           </Link>
-          {isAdmin && (
+          {isAdmin ? (
             <Link to="/admin" className="group rounded-xl border bg-card p-4 shadow-card hover:border-primary hover:shadow-red transition">
               <Shield className="size-6 text-primary" /><p className="mt-2 font-medium">Admin Panel</p>
             </Link>
+          ) : (
+            <button onClick={claimAdmin} className="text-left rounded-xl border bg-card p-4 shadow-card hover:border-primary hover:shadow-red transition">
+              <Shield className="size-6 text-primary" /><p className="mt-2 font-medium">Claim Admin</p>
+            </button>
           )}
         </div>
+
 
         <div className="rounded-2xl border bg-card p-6 shadow-card space-y-4">
           <div className="flex items-center gap-3">
