@@ -25,6 +25,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FleetSlugRouteImport } from './routes/fleet.$slug'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedWishlistRouteImport } from './routes/_authenticated/wishlist'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
@@ -109,6 +110,11 @@ const FleetSlugRoute = FleetSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => FleetRoute,
 } as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
+} as any)
 const AuthenticatedWishlistRoute = AuthenticatedWishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
@@ -134,7 +140,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/career': typeof CareerRoute
   '/cities': typeof CitiesRoute
   '/contact': typeof ContactRoute
@@ -149,13 +155,14 @@ export interface FileRoutesByFullPath {
   '/bookings': typeof AuthenticatedBookingsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/wishlist': typeof AuthenticatedWishlistRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/fleet/$slug': typeof FleetSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/career': typeof CareerRoute
   '/cities': typeof CitiesRoute
   '/contact': typeof ContactRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/bookings': typeof AuthenticatedBookingsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/wishlist': typeof AuthenticatedWishlistRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/fleet/$slug': typeof FleetSlugRoute
 }
 export interface FileRoutesById {
@@ -178,7 +186,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/career': typeof CareerRoute
   '/cities': typeof CitiesRoute
   '/contact': typeof ContactRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/wishlist': typeof AuthenticatedWishlistRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/fleet/$slug': typeof FleetSlugRoute
 }
 export interface FileRouteTypes {
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/bookings'
     | '/profile'
     | '/wishlist'
+    | '/blog/$slug'
     | '/fleet/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/bookings'
     | '/profile'
     | '/wishlist'
+    | '/blog/$slug'
     | '/fleet/$slug'
   id:
     | '__root__'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/_authenticated/bookings'
     | '/_authenticated/profile'
     | '/_authenticated/wishlist'
+    | '/blog/$slug'
     | '/fleet/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -267,7 +279,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
-  BlogRoute: typeof BlogRoute
+  BlogRoute: typeof BlogRouteWithChildren
   CareerRoute: typeof CareerRoute
   CitiesRoute: typeof CitiesRoute
   ContactRoute: typeof ContactRoute
@@ -394,6 +406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FleetSlugRouteImport
       parentRoute: typeof FleetRoute
     }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
+    }
     '/_authenticated/wishlist': {
       id: '/_authenticated/wishlist'
       path: '/wishlist'
@@ -442,6 +461,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 interface FleetRouteChildren {
   FleetSlugRoute: typeof FleetSlugRoute
 }
@@ -457,7 +486,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
-  BlogRoute: BlogRoute,
+  BlogRoute: BlogRouteWithChildren,
   CareerRoute: CareerRoute,
   CitiesRoute: CitiesRoute,
   ContactRoute: ContactRoute,
