@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { BookingDialog } from "@/components/site/booking-dialog";
 import { VehicleCard } from "@/components/site/vehicle-card";
+import { VehicleReviews } from "@/components/site/vehicle-reviews";
 import { whatsappLink } from "@/lib/whatsapp";
 import { supabase } from "@/integrations/supabase/client";
 
