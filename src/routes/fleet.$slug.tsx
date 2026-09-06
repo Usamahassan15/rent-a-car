@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { BookingDialog } from "@/components/site/booking-dialog";
 import { VehicleCard } from "@/components/site/vehicle-card";
+import { VehicleReviews } from "@/components/site/vehicle-reviews";
 import { whatsappLink } from "@/lib/whatsapp";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -186,7 +187,10 @@ function VehicleDetail() {
         </div>
       </section>
 
+      <VehicleReviews vehicleId={v.id} vehicleName={v.name} />
+
       <section className="container-wide py-16">
+
         <h2 className="font-display text-3xl md:text-4xl font-bold">You may also like</h2>
         <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {related?.map((r) => <VehicleCard key={r.id} v={r as any} />)}

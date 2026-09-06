@@ -90,7 +90,7 @@ export function VehicleDialog({ vehicle, trigger }: { vehicle?: VehicleRow; trig
     };
 
     const { error } = vehicle
-      ? await supabase.from("vehicles").update(payload).eq("id", vehicle.id)
+      ? await supabase.from("vehicles").update(payload as any).eq("id", vehicle.id)
       : await supabase.from("vehicles").insert(payload as any);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
