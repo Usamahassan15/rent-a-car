@@ -44,17 +44,25 @@ function BlogPage() {
       <section className="container-wide py-16">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((p) => (
-            <article key={p.slug} className="group overflow-hidden rounded-2xl border bg-card shadow-card transition hover:shadow-hover hover:-translate-y-1">
-              <div className="aspect-[16/10] bg-luxury-gradient" />
-              <div className="p-6">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Calendar className="size-3.5" />
-                  <time>{new Date(p.published_at).toLocaleDateString()}</time>
+            <Link key={p.slug} to="/blog/$slug" params={{ slug: p.slug }} className="block">
+              <article className="group h-full overflow-hidden rounded-2xl border bg-card shadow-card transition hover:shadow-hover hover:-translate-y-1">
+                {p.cover_image ? (
+                  <img src={p.cover_image} alt={p.title} loading="lazy" className="aspect-[16/10] w-full object-cover" />
+                ) : (
+                  <div className="aspect-[16/10] bg-luxury-gradient" />
+                )}
+                <div className="p-6">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Calendar className="size-3.5" />
+                    <time>{new Date(p.published_at).toLocaleDateString()}</time>
+                  </div>
+                  <h2 className="mt-3 font-display text-xl font-semibold group-hover:text-primary transition">{p.title}</h2>
+                  <p className="mt-2 text-sm text-muted-foreground">{p.excerpt}</p>
+                  <span className="mt-4 inline-block text-sm font-medium text-primary">Read article →</span>
                 </div>
-                <h3 className="mt-3 font-display text-xl font-semibold group-hover:text-primary transition">{p.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{p.excerpt}</p>
-              </div>
-            </article>
+              </article>
+            </Link>
+
           ))}
         </div>
       </section>
