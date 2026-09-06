@@ -186,7 +186,10 @@ function VehicleDetail() {
         </div>
       </section>
 
+      <VehicleReviews vehicleId={v.id} vehicleName={v.name} />
+
       <section className="container-wide py-16">
+
         <h2 className="font-display text-3xl md:text-4xl font-bold">You may also like</h2>
         <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {related?.map((r) => <VehicleCard key={r.id} v={r as any} />)}
