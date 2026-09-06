@@ -63,7 +63,7 @@ function AdminPage() {
   }
 
   async function toggle(table: "deals" | "blog_posts", id: string, patch: { published?: boolean; is_active?: boolean }, key: string) {
-    const { error } = await supabase.from(table).update(patch).eq("id", id);
+    const { error } = await supabase.from(table).update(patch as never).eq("id", id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: [key] });
   }
