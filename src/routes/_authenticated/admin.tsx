@@ -118,29 +118,39 @@ function AdminPage() {
   return (
     <div className="pt-24 pb-16 min-h-screen bg-secondary">
       <div className="container-wide">
-        <div className="flex items-center gap-3">
-          <Shield className="size-7 text-primary" />
-          <h1 className="font-display text-3xl md:text-4xl font-bold">Admin Panel</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Shield className="size-7 text-primary" />
+            <h1 className="font-display text-3xl md:text-4xl font-bold">Admin Panel</h1>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={exportBookings}><Download className="mr-2 size-4" />Export bookings</Button>
+            <VehicleDialog trigger={<Button><Plus className="mr-2 size-4" />Add vehicle</Button>} />
+          </div>
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-4">
+        <div className="mt-6 grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
           <Stat label="Bookings" n={bookings?.length ?? 0} />
           <Stat label="Vehicles" n={vehicles?.length ?? 0} />
           <Stat label="Messages" n={contacts?.length ?? 0} />
           <Stat label="Applications" n={careers?.length ?? 0} />
+          <Stat label="Offers" n={deals?.length ?? 0} />
+          <Stat label="Blog posts" n={posts?.length ?? 0} />
         </div>
 
         <Tabs defaultValue="bookings" className="mt-8">
-          <TabsList>
+          <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
+            <TabsTrigger value="deals">Offers</TabsTrigger>
+            <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="contacts">Messages</TabsTrigger>
             <TabsTrigger value="reviews">Reviews</TabsTrigger>
             <TabsTrigger value="careers">Applications</TabsTrigger>
-
           </TabsList>
 
           <TabsContent value="bookings" className="mt-4">
+
             <div className="rounded-xl border bg-card overflow-x-auto">
               <Table>
                 <TableHeader>
