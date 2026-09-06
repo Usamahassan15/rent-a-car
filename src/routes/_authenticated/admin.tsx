@@ -196,6 +196,7 @@ function AdminPage() {
                     <TableHead>Featured</TableHead>
                     <TableHead>Published</TableHead>
                     <TableHead>Available</TableHead>
+                    <TableHead>Edit</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -219,12 +220,82 @@ function AdminPage() {
                           {v.is_available ? "Available" : "Booked"}
                         </Button>
                       </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <VehicleDialog vehicle={v} trigger={<Button size="sm" variant="outline" aria-label="Edit vehicle"><Pencil className="size-4" /></Button>} />
+                          <Button size="sm" variant="outline" aria-label="Delete vehicle" onClick={() => remove("vehicles", v.id, "admin-vehicles")}>
+                            <Trash2 className="size-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </div>
           </TabsContent>
+
+          <TabsContent value="deals" className="mt-4">
+            <div className="flex justify-end">
+              <DealDialog trigger={<Button size="sm"><Plus className="mr-2 size-4" />New offer</Button>} />
+            </div>
+            <div className="mt-3 rounded-xl border bg-card divide-y">
+              {deals?.map((d: any) => (
+                <div key={d.id} className="p-4 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <strong>{d.title}</strong>
+                      {d.discount_percent && <Badge variant="outline">{d.discount_percent}% off</Badge>}
+                      {d.code && <Badge variant="outline">{d.code}</Badge>}
+                      {!d.is_active && <Badge variant="outline">Inactive</Badge>}
+                    </div>
+                    <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{d.subtitle ?? d.description}</p>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button size="sm" variant={d.is_active ? "default" : "outline"} onClick={() => toggle("deals", d.id, { is_active: !d.is_active }, "admin-deals")}>
+                      {d.is_active ? "Live" : "Hidden"}
+                    </Button>
+                    <DealDialog deal={d} trigger={<Button size="sm" variant="outline" aria-label="Edit offer"><Pencil className="size-4" /></Button>} />
+                    <Button size="sm" variant="outline" aria-label="Delete offer" onClick={() => remove("deals", d.id, "admin-deals")}>
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {!deals?.length && <p className="p-6 text-sm text-muted-foreground">No offers yet.</p>}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="blog" className="mt-4">
+            <div className="flex justify-end">
+              <PostDialog trigger={<Button size="sm"><Plus className="mr-2 size-4" />New post</Button>} />
+            </div>
+            <div className="mt-3 rounded-xl border bg-card divide-y">
+              {posts?.map((p: any) => (
+                <div key={p.id} className="p-4 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <strong>{p.title}</strong>
+                      {!p.published && <Badge variant="outline">Draft</Badge>}
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">/blog/{p.slug}</p>
+                    <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{p.excerpt}</p>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button size="sm" variant={p.published ? "default" : "outline"} onClick={() => toggle("blog_posts", p.id, { published: !p.published }, "admin-posts")}>
+                      {p.published ? "Live" : "Draft"}
+                    </Button>
+                    <PostDialog post={p} trigger={<Button size="sm" variant="outline" aria-label="Edit post"><Pencil className="size-4" /></Button>} />
+                    <Button size="sm" variant="outline" aria-label="Delete post" onClick={() => remove("blog_posts", p.id, "admin-posts")}>
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {!posts?.length && <p className="p-6 text-sm text-muted-foreground">No posts yet.</p>}
+            </div>
+          </TabsContent>
+
 
           <TabsContent value="reviews" className="mt-4">
             <div className="rounded-xl border bg-card divide-y">
