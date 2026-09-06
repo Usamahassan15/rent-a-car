@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield } from "lucide-react";
+import { VehicleDialog } from "@/components/admin/vehicle-dialog";
+import { DealDialog, PostDialog } from "@/components/admin/content-dialogs";
+import { Shield, Plus, Pencil, Trash2, Download } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — Regal Auto" }, { name: "robots", content: "noindex" }] }),
