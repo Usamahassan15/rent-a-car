@@ -44,6 +44,46 @@ function AdminPage() {
     queryKey: ["admin-reviews"],
     queryFn: async () => (await supabase.from("reviews").select("*").order("created_at", { ascending: false })).data ?? [],
   });
+  const { data: deals } = useQuery({
+    queryKey: ["admin-deals"],
+    queryFn: async () => (await supabase.from("deals").select("*").order("created_at", { ascending: false })).data ?? [],
+  });
+  const { data: posts } = useQuery({
+    queryKey: ["admin-posts"],
+    queryFn: async () => (await supabase.from("blog_posts").select("*").order("created_at", { ascending: false })).data ?? [],
+  });
+
+  async function remove(table: "vehicles" | "deals" | "blog_posts" | "reviews", id: string, key: string) {
+    if (!window.confirm("Delete this permanently?")) return;
+    const { error } = await supabase.from(table).delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Deleted");
+    qc.invalidateQueries({ queryKey: [key] });
+    qc.invalidateQueries({ queryKey: ["all-vehicles"] });
+  }
+
+  async function toggle(table: "deals" | "blog_posts", id: string, patch: Record<string, boolean>, key: string) {
+    const { error } = await supabase.from(table).update(patch).eq("id", id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: [key] });
+  }
+
+  function exportBookings() {
+    const rows = bookings ?? [];
+    if (!rows.length) return toast.error("No bookings to export");
+    const head = ["Name", "Phone", "Email", "Vehicle", "Pickup", "Return", "Pickup city", "Drop city", "Status", "Created"];
+    const csv = [head, ...rows.map((b: any) => [
+      b.full_name, b.phone, b.email ?? "", b.vehicles ? `${b.vehicles.brand} ${b.vehicles.name}` : "",
+      b.pickup_date, b.return_date, b.pickup_city ?? "", b.drop_city ?? "", b.status,
+      new Date(b.created_at).toLocaleString(),
+    ])].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = `regal-auto-bookings-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  }
+
+
 
   async function updateBookingStatus(id: string, status: "confirmed" | "cancelled" | "pending" | "active" | "completed") {
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
