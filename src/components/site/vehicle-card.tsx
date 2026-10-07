@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { BookingDialog } from "@/components/site/booking-dialog";
 import { useEffect, useState } from "react";
 
 export interface VehicleCardData {
@@ -102,9 +103,9 @@ export function VehicleCard({ v, priority }: { v: VehicleCardData; priority?: bo
               <span className="text-xs font-normal text-muted-foreground">/day</span>
             </p>
           </div>
-          <Link to="/fleet/$slug" params={{ slug: v.slug }}>
+          <BookingDialog vehicleId={(v as any).id} vehicleName={v.name} vehicleSlug={v.slug} vehicleImage={v.images?.[0] ?? undefined} trigger={
             <Button size="sm" className="bg-primary hover:bg-primary/90">Rent</Button>
-          </Link>
+          } />
         </div>
       </div>
     </article>
