@@ -125,7 +125,7 @@ function VehicleDetail() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <BookingDialog vehicleId={v.id} vehicleName={v.name} trigger={
+            <BookingDialog vehicleId={v.id} vehicleName={v.name} vehicleSlug={v.slug} vehicleImage={images[0]} trigger={
               <Button size="lg" className="h-14 px-8 bg-primary hover:bg-primary/90 shadow-red flex-1 min-w-[200px]">Rent Now</Button>
             } />
             <a href={whatsappLink(`Hi, I want to book the ${v.name}.`)} target="_blank" rel="noreferrer" className="flex-1 min-w-[200px]">

@@ -19,6 +19,8 @@ export interface BookingWhatsAppInput {
   pickup_time?: string;
   message?: string;
   promo_code?: string;
+  vehicle_link?: string;
+  vehicle_image?: string;
 }
 
 export function bookingMessage(b: BookingWhatsAppInput) {
@@ -31,6 +33,8 @@ export function bookingMessage(b: BookingWhatsAppInput) {
     b.email ? `✉️ Email: ${b.email}` : null,
     ``,
     b.vehicle ? `🚘 Vehicle: ${b.vehicle}` : null,
+    b.vehicle_link ? `🔗 Car Link: ${b.vehicle_link}` : null,
+    b.vehicle_image ? `🖼 Car Photo: ${b.vehicle_image}` : null,
     b.pickup_city ? `📍 Pickup: ${b.pickup_city}` : null,
     b.drop_city ? `🏁 Drop: ${b.drop_city}` : null,
     b.pickup_date ? `📅 From: ${b.pickup_date}${b.pickup_time ? " " + b.pickup_time : ""}` : null,

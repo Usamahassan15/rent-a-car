@@ -29,8 +29,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function BookingDialog({
-  trigger, vehicleId, vehicleName,
-}: { trigger: ReactNode; vehicleId?: string; vehicleName?: string }) {
+  trigger, vehicleId, vehicleName, vehicleSlug, vehicleImage,
+}: { trigger: ReactNode; vehicleId?: string; vehicleName?: string; vehicleSlug?: string; vehicleImage?: string }) {
   const [open, setOpen] = useState(false);
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -43,7 +43,15 @@ export function BookingDialog({
 
   async function onSubmit(values: FormData) {
     // Open WhatsApp immediately while we still have the user gesture (avoids popup blockers)
-    const msg = bookingMessage({ ...values, vehicle: vehicleName });
+    const origin = window.location.origin;
+    const msg = bookingMessage({
+      ...values,
+      vehicle: vehicleName,
+      vehicle_link: vehicleSlug ? `${origin}/fleet/${vehicleSlug}` : undefined,
+      vehicle_image: vehicleImage
+        ? (vehicleImage.startsWith("http") ? vehicleImage : `${origin}${vehicleImage}`)
+        : undefined,
+    });
     const waWin = window.open(whatsappLink(msg), "_blank");
 
     // Persist booking in background — never block the WhatsApp handoff
