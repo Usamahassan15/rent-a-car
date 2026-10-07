@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 
 
 export const Route = createFileRoute("/auth")({
@@ -55,7 +56,7 @@ function AuthPage() {
 
   async function onSignup(v: z.infer<typeof signUp>) {
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: v.email,
       password: v.password,
       options: {
@@ -65,16 +66,21 @@ function AuthPage() {
     });
     setLoading(false);
     if (error) return toast.error(error.message);
-    toast.success("Account created — you're signed in.");
-    navigate({ to: "/profile" });
+    if (data.session) {
+      toast.success("Account created — you're signed in.");
+      navigate({ to: "/profile" });
+    } else {
+      toast.success("Account created! Check your email to confirm, then sign in.");
+    }
   }
 
   async function google() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin + "/profile" },
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin + "/auth",
     });
-    if (error) toast.error("Google sign-in failed");
+    if (result.error) { toast.error("Google sign-in failed"); return; }
+    if (result.redirected) return;
+    navigate({ to: "/profile" });
   }
 
   return (
