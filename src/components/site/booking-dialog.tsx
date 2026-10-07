@@ -29,8 +29,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function BookingDialog({
-  trigger, vehicleId, vehicleName,
-}: { trigger: ReactNode; vehicleId?: string; vehicleName?: string }) {
+  trigger, vehicleId, vehicleName, vehicleSlug, vehicleImage,
+}: { trigger: ReactNode; vehicleId?: string; vehicleName?: string; vehicleSlug?: string; vehicleImage?: string }) {
   const [open, setOpen] = useState(false);
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
