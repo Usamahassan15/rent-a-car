@@ -32,6 +32,7 @@ export function BookingDialog({
   trigger, vehicleId, vehicleName, vehicleSlug, vehicleImage,
 }: { trigger: ReactNode; vehicleId?: string; vehicleName?: string; vehicleSlug?: string; vehicleImage?: string }) {
   const [open, setOpen] = useState(false);
+  const [waUrl, setWaUrl] = useState<string | null>(null);
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -52,7 +53,10 @@ export function BookingDialog({
         ? (vehicleImage.startsWith("http") ? vehicleImage : `${origin}${vehicleImage}`)
         : undefined,
     });
-    const waWin = window.open(whatsappLink(msg), "_blank");
+    const url = whatsappLink(msg);
+    setWaUrl(url);
+    let waWin: Window | null = null;
+    try { waWin = window.open(url, "_blank", "noopener"); } catch { waWin = null; }
 
     // Persist booking in background — never block the WhatsApp handoff
     try {
@@ -77,17 +81,13 @@ export function BookingDialog({
       console.warn("Booking save error:", e);
     }
 
-    toast.success("Booking sent! Continue on WhatsApp.");
-    if (!waWin) {
-      // Fallback if popup was blocked
-      window.location.href = whatsappLink(msg);
-    }
-    setOpen(false);
+    toast.success("Booking saved! Send it on WhatsApp.");
+    void waWin;
     form.reset();
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setWaUrl(null); }}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-h-[92vh] overflow-y-auto max-w-2xl">
         <DialogHeader>
@@ -96,6 +96,16 @@ export function BookingDialog({
             {vehicleName ? `Enquire about the ${vehicleName}.` : "Send your booking. We reply on WhatsApp within minutes."}
           </DialogDescription>
         </DialogHeader>
+        {waUrl ? (
+          <div className="py-6 text-center space-y-4">
+            <p className="font-display text-xl font-semibold">Booking saved ✓</p>
+            <p className="text-sm text-muted-foreground">Tap below to send your details on WhatsApp (0317 5817400).</p>
+            <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90">
+              <a href={waUrl} target="_blank" rel="noopener noreferrer">Send on WhatsApp</a>
+            </Button>
+            <Button type="button" variant="outline" className="w-full" onClick={() => { setOpen(false); setWaUrl(null); }}>Close</Button>
+          </div>
+        ) : (
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 sm:grid-cols-2">
           <Field label="Full Name" error={form.formState.errors.full_name?.message}>
             <Input {...form.register("full_name")} placeholder="Your full name" />
@@ -152,6 +162,7 @@ export function BookingDialog({
             <Button type="button" size="lg" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
           </div>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );
